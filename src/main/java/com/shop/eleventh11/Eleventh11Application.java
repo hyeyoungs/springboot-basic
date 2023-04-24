@@ -18,7 +18,7 @@ public class Eleventh11Application {
 }
 
 @RestController
-//@RequestMapping("/items")
+@RequestMapping("/items")
 class RestApiDemoController {
 	private final List<Item> items = new ArrayList<>();
 
@@ -31,12 +31,12 @@ class RestApiDemoController {
 							));
 	}
 
-	@GetMapping("/items")
+	@GetMapping
 	Iterable<Item> getItems() {
 		return items;
 	}
 
-	@GetMapping("/items/{id}")
+	@GetMapping("{id}")
 	Optional<Item> getItemById(@PathVariable String id) {
 		for (Item c : items) {
 			if (c.getId().equals(id)) {
@@ -47,13 +47,13 @@ class RestApiDemoController {
 		return Optional.empty();
 	}
 
-	@PostMapping("/items")
+	@PostMapping
 	Item postItem(@RequestBody Item item) {
 		items.add(item);
 		return item;
 	}
 
-	@PutMapping("/items/{id}")
+	@PutMapping("{id}")
 	Item putItem(@PathVariable String id,
 				 @RequestBody Item item) {
 		int itemIndex = -1;
@@ -70,7 +70,7 @@ class RestApiDemoController {
 	}
 
 
-	@DeleteMapping("/items/{id}")
+	@DeleteMapping("{id}")
 	void deleteItem(@PathVariable String id) {
 		items.removeIf(c -> c.getId().equals(id));
 	}
