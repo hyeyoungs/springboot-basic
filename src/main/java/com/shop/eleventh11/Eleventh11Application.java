@@ -20,66 +20,6 @@ public class Eleventh11Application {
 }
 
 @RestController
-@RequestMapping("/members")
-class MemberController {
-	private final List<Member> members = new ArrayList<>();
-
-	public MemberController() {
-		members.addAll(List.of(
-				new Member("hyeyoungs", "khy1234"),
-				new Member("juhui", "kjh1234"),
-				new Member("yunjeong", "lee1234"),
-				new Member("starbucks", "star1234")
-							  ));
-	}
-
-	@GetMapping
-	Iterable<Member> getMembers() {
-		return members;
-	}
-
-	@GetMapping("{id}")
-	Optional<Member> getMemberById(@PathVariable String id) {
-		for (Member m : members) {
-			if (m.getId().equals(id)) {
-				return Optional.of(m);
-			}
-		}
-
-		return Optional.empty();
-	}
-
-	@PostMapping
-	Member postMember(@RequestBody Member member) {
-		members.add(member);
-		return member;
-	}
-
-	@PutMapping("/{id}")
-	ResponseEntity<Member> putMember(@PathVariable String id,
-								 @RequestBody Member member) {
-		int memberIndex = -1;
-
-		for (Member m : members) {
-			if (m.getId().equals(id)) {
-				memberIndex = members.indexOf(m);
-				members.set(memberIndex, member);
-			}
-		}
-
-		//HTTP status codes are required for PUT method responses
-		return (memberIndex == -1) ?
-			   new ResponseEntity<>(member, HttpStatus.NO_CONTENT) :
-			   new ResponseEntity<>(member, HttpStatus.OK);
-	}
-
-	@DeleteMapping("{id}")
-	void deleteMember(@PathVariable String id) {
-		members.removeIf(m -> m.getId().equals(id));
-	}
-}
-
-@RestController
 @RequestMapping("/items")
 class ItemController {
 	private final List<Item> items = new ArrayList<>();
@@ -163,34 +103,5 @@ class Item {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-}
-
-class Member {
-	private static int endUserId = 1;
-	private final String id;
-	private final String userId;
-	private String password;
-
-	public Member(String userId, String password) {
-		this.id = String.valueOf(endUserId++);
-		this.userId = userId;
-		this.password = password;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 }
