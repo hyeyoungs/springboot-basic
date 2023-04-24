@@ -2,14 +2,21 @@ package com.shop.eleventh11;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.annotation.PostConstruct;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+interface ItemRepository extends CrudRepository<Item, String> {
+}
 
 @SpringBootApplication
 public class Eleventh11Application {
@@ -19,70 +26,72 @@ public class Eleventh11Application {
 	}
 }
 
-@RestController
-@RequestMapping("/items")
-class ItemController {
-	private final List<Item> items = new ArrayList<>();
+@Component
+class DataLoader {
+	private final ItemRepository itemRepository;
 
-	public ItemController() {
-		items.addAll(List.of(
+	public DataLoader(ItemRepository itemRepository) {
+		this.itemRepository = itemRepository;
+	}
+
+	@PostConstruct
+	private void loadData() {
+		itemRepository.saveAll(List.of(
 				new Item("Macbook 14"),
 				new Item("Apple watch 4"),
 				new Item("iphone SE"),
 				new Item("ipad Air 3")
-							));
+									  ));
+	}
+}
+
+@RestController
+@RequestMapping("/items")
+class RestApiDemoController {
+	private final ItemRepository itemRepository;
+
+	public RestApiDemoController(ItemRepository itemRepository) {
+		this.itemRepository = itemRepository;
 	}
 
 	@GetMapping
 	Iterable<Item> getItems() {
-		return items;
+		return itemRepository.findAll();
 	}
 
-	@GetMapping("{id}")
+	@GetMapping("/{id}")
 	Optional<Item> getItemById(@PathVariable String id) {
-		for (Item c : items) {
-			if (c.getId().equals(id)) {
-				return Optional.of(c);
-			}
-		}
-
-		return Optional.empty();
+		return itemRepository.findById(id);
 	}
 
 	@PostMapping
 	Item postItem(@RequestBody Item item) {
-		items.add(item);
-		return item;
+		return itemRepository.save(item);
 	}
 
 	@PutMapping("/{id}")
 	ResponseEntity<Item> putItem(@PathVariable String id,
 								 @RequestBody Item item) {
-		int itemIndex = -1;
 
-		for (Item c : items) {
-			if (c.getId().equals(id)) {
-				itemIndex = items.indexOf(c);
-				items.set(itemIndex, item);
-			}
-		}
-
-		//HTTP status codes are required for PUT method responses
-		return (itemIndex == -1) ?
-			   new ResponseEntity<>(postItem(item), HttpStatus.CREATED) :
-			   new ResponseEntity<>(item, HttpStatus.OK);
+		return (itemRepository.existsById(id))
+			   ? new ResponseEntity<>(itemRepository.save(item), HttpStatus.OK)
+			   : new ResponseEntity<>(itemRepository.save(item), HttpStatus.CREATED);
 	}
 
-
-	@DeleteMapping("{id}")
+	@DeleteMapping("/{id}")
 	void deleteItem(@PathVariable String id) {
-		items.removeIf(c -> c.getId().equals(id));
+		itemRepository.deleteById(id);
 	}
 }
 
+@Entity
 class Item {
-	private final String id;
+	@Id
+	private String id;
 	private String name;
+
+	public Item() {
+	}
 
 	public Item(String id, String name) {
 		this.id = id;
@@ -95,6 +104,10 @@ class Item {
 
 	public String getId() {
 		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getName() {
