@@ -2,6 +2,8 @@ package com.shop.eleventh11;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -53,9 +55,9 @@ class RestApiDemoController {
 		return item;
 	}
 
-	@PutMapping("{id}")
-	Item putItem(@PathVariable String id,
-				 @RequestBody Item item) {
+	@PutMapping("/{id}")
+	ResponseEntity<Item> putItem(@PathVariable String id,
+								 @RequestBody Item item) {
 		int itemIndex = -1;
 
 		for (Item c : items) {
@@ -65,8 +67,10 @@ class RestApiDemoController {
 			}
 		}
 
+		//HTTP status codes are required for PUT method responses
 		return (itemIndex == -1) ?
-			   postItem(item) : item;
+			   new ResponseEntity<>(postItem(item), HttpStatus.CREATED) :
+			   new ResponseEntity<>(item, HttpStatus.OK);
 	}
 
 
