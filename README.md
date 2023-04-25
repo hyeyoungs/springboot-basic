@@ -122,7 +122,7 @@
 <br>→ 코드를 쉽게 유지 관리  전체 소스 코드를 다시 컴파일할 필요 없이 간단히 concern을 추가하거나 제거할 수 있음.
 - 사용 어떻게? 필터와 연관됨
 - Spring AOP 구현 2가지 유형 - XML 구성 파일 사용, AspectJ 주석 스타일 사용
-  ```java
+  ```xml
   <parent>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
@@ -138,6 +138,7 @@
   ```
 
 <img src = "https://user-images.githubusercontent.com/29566893/234223899-8cbf5c32-baa9-4211-b14f-0855bc06469a.png" width = "50%">
+
 - Joinpoint : 메서드 실행 또는 예외 처리와 같은 프로그램 실행 중 지점. Spring AOP에서 JoinPoint는 항상 메소드 실행
 - Pointcut : 특정 Joinpoint에 aspect가 적용  `execution( [리턴 타입] [패키지 경로] [클래스명].[메소드명]( [매개 변수] ) )`
 - 클래스와 패키지, 메소드 시그니처를 이용해 비즈니스 메소드 필터링
